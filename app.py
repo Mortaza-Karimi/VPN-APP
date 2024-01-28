@@ -146,6 +146,29 @@ def user_fundup_confirm():
 
     return jsonify(response),200
 
+@app.route("/users/get_data")
+def user_get_data():
+    data = request.args
+    user_token = data["user_token"]
+    user = users_cur.execute(f"SELECT * FROM users WHERE token='{user_token}'").fetchall()[0]
+    client = xui_cur.execute(f"SELECT * FROM client_traffics WHERE email='{user[0]}'").fetchall()[0]
+    used_up = int(client[4])/(1024*1024)
+    used_down = int(client[5])/(1024*1024)
+    used_total = used_up+used_down
+    response = {
+        'email' : user[0],
+        'password':user[1],
+        'token':user[2],
+        'fund':user[3],
+        'used_up':used_up,
+        'used_down':used_down,
+        'used_total':used_total
+    }
+    print(user)
+    print(client)
+    return jsonify(response),200
+
+
 @app.route("/users/get_configs")
 def user_get_configs():
     data = request.args
